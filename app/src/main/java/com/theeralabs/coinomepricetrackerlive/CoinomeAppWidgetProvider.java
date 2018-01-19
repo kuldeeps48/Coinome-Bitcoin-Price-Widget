@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -22,37 +23,49 @@ import static android.content.Context.ALARM_SERVICE;
 public class CoinomeAppWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = CoinomeAppWidgetProvider.class.getSimpleName();
-    private static final String UPDATE = "android.appwidget.action.APPWIDGET_UPDATE";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        context.getApplicationContext().registerReceiver(screenOnReceiver,filter);
+        super.onReceive(context, intent);
 
-        if (Objects.equals(intent.getAction(), UPDATE)) {
-            setButton(context);
-            cancelJobSetToUpdateInFuture(context);
-            scheduleNow(context);
-        } else {
-            super.onReceive(context, intent);
+        Bundle extras = intent.getExtras();
+        if(extras!=null) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                    CoinomeAppWidgetProvider.class.getName());
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+
+            onUpdate(context, appWidgetManager, appWidgetIds);
         }
     }
 
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
         Log.d(TAG, "Updating widget...");
-        //Refresh button listener
-        setButton(context);
+
+        for (int appWidgetId : appWidgetIds) {
+            //Add Refresh button listener
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.coinome_appwidget);
+            remoteViews.setOnClickPendingIntent(R.id.btn_refresh,
+                    getPendingButtonClickIntent(context));
+
+            // Tell the AppWidgetManager to perform an update on the current app widget
+            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+            //Start a service
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.getApplicationContext().startForegroundService(new Intent(context, GetPriceFromServer.class));
+            } else
+                context.getApplicationContext().startService(new Intent(context, GetPriceFromServer.class));
+        }
     }
 
 
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.getApplicationContext().startForegroundService(new Intent(context, GetPriceFromServer.class));
-        } else
-            context.getApplicationContext().startService(new Intent(context, GetPriceFromServer.class));
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        context.getApplicationContext().registerReceiver(screenOnReceiver,filter);
     }
 
 
@@ -66,7 +79,11 @@ public class CoinomeAppWidgetProvider extends AppWidgetProvider {
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         cancelJobSetToUpdateInFuture(context);
-        context.getApplicationContext().unregisterReceiver(screenOnReceiver);
+        try {
+            context.getApplicationContext().unregisterReceiver(screenOnReceiver);
+        } catch (Exception e) {
+            Log.d(TAG, "onDeleted: ScreenOn Broadcast Receiver not found");
+        }
         Log.d(TAG, "onDeleted: Cancelled Future Alarm...");
         super.onDeleted(context, appWidgetIds);
     }
@@ -75,44 +92,35 @@ public class CoinomeAppWidgetProvider extends AppWidgetProvider {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Objects.equals(intent.getAction(), "android.intent.action.SCREEN_ON")) {
-                setButton(context);
                 cancelJobSetToUpdateInFuture(context);
-                scheduleNow(context);
+
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                        CoinomeAppWidgetProvider.class.getName());
+                int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+
+                onUpdate(context, appWidgetManager, appWidgetIds);
             }
         }
     };
 
-    private void setButton(Context context) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.coinome_appwidget);
-        remoteViews.setOnClickPendingIntent(R.id.btn_refresh, getPendingButtonClickIntent(context, UPDATE));
 
-        //Update widget
-        AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        ComponentName cn = new ComponentName(context, CoinomeAppWidgetProvider.class);
-        mgr.updateAppWidget(cn, remoteViews);
-    }
+    private PendingIntent getPendingButtonClickIntent(Context context) {
+        Intent intent = new Intent(context, CoinomeAppWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
-    private void scheduleNow(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.getApplicationContext().startForegroundService(new Intent(context, GetPriceFromServer.class));
-        } else
-            context.getApplicationContext().startService(new Intent(context, GetPriceFromServer.class));
-    }
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
+        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(context, CoinomeAppWidgetProvider.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 
-    private PendingIntent getPendingButtonClickIntent(Context context, String action) {
-        Intent intent = new Intent(context, getClass());
-        intent.setAction(action);
-        return PendingIntent.getBroadcast(context, 7, intent, 0);
+        return PendingIntent.getBroadcast(context, 7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private void cancelJobSetToUpdateInFuture(Context context) {
-        Intent intent = new Intent("android.appwidget.action.APPWIDGET_UPDATE");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(),
-                1, intent, 0);
-
         AlarmManager alarmManager = (AlarmManager) context.getApplicationContext().getSystemService(ALARM_SERVICE);
         assert alarmManager != null;
-        alarmManager.cancel(pendingIntent);
+        alarmManager.cancel(getPendingButtonClickIntent(context));
+
         Log.d(TAG, "cancelJobSetToUpdateInFuture: Cancelled Alarm...");
     }
 

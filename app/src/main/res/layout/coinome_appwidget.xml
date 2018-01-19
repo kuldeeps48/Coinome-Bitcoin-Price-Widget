@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/darker_gray"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="@dimen/widget_padding">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +52,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="8dp"
                 android:background="@drawable/refresh_icon"
                 android:clickable="true"
                 android:elevation="4dp"
@@ -71,7 +71,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Buy: "
+                android:text="@string/buy"
                 android:textAppearance="@android:style/TextAppearance.Material.Caption"
                 android:textSize="14sp" />
 
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:fontFamily="sans-serif"
-                android:text="----------"
+                android:text="@string/blank"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"
                 android:textSize="15sp" />
 
@@ -107,7 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="1dp"
-                android:text="Sell: "
+                android:text="@string/sell"
                 android:textAppearance="@android:style/TextAppearance.Material.Caption"
                 android:textSize="14sp" />
 
@@ -116,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="----------"
+                android:text="@string/blank_2"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"
                 android:textSize="15sp" />
 

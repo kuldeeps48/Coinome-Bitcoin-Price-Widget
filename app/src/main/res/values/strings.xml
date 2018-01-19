@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">Coinome Price Tracker Live</string>
     <string name="btc_inr">BTC/INR</string>
+    <string name="buy">Buy:</string>
+    <string name="blank">----------</string>
+    <string name="sell">Sell:</string>
+    <string name="blank_2">----------</string>
+    <string name="choose_cryptocurrency_and_update_interval">Select Your Cryptocurrency</string>
+    <string name="dash">Dash</string>
+    <string name="litecoin">Litecoin</string>
+    <string name="bitcoin_cash">Bitcoin Cash</string>
+    <string name="bitcoin">Bitcoin</string>
 </resources>

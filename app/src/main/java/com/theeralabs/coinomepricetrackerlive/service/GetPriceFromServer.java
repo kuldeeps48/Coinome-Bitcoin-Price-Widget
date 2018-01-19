@@ -44,28 +44,32 @@ public class GetPriceFromServer extends Service {
     private static final long FUTURE_UPDATE_TIME_IN_MILLISEC = 300_000;
     private static final String PREF_NAME = "LastPrice";
 
-    private void setFutureUpdate() {
-        Intent intent = new Intent("android.appwidget.action.APPWIDGET_UPDATE");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
-                1, intent, 0);
+    private void setFutureUpdate(Context context) {
 
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(ALARM_SERVICE);
         assert alarmManager != null;
         alarmManager.setExact(AlarmManager.ELAPSED_REALTIME,
                 SystemClock.elapsedRealtime() + FUTURE_UPDATE_TIME_IN_MILLISEC,
-                pendingIntent);
+                getPendingButtonClickIntent(context));
         Log.d(TAG, "setFutureUpdate: Alarm set for " +
                 SystemClock.elapsedRealtime() + FUTURE_UPDATE_TIME_IN_MILLISEC);
     }
 
-    private void cancelAlarmSetToUpdateInFuture(Context context) {
-        Intent intent = new Intent("android.appwidget.action.APPWIDGET_UPDATE");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
-                1, intent, 0);
+    private PendingIntent getPendingButtonClickIntent(Context context) {
+        Intent intent = new Intent(context, CoinomeAppWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
+        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(context, CoinomeAppWidgetProvider.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+
+        return PendingIntent.getBroadcast(context, 7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void cancelAlarmSetToUpdateInFuture(Context context) {
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(ALARM_SERVICE);
         assert alarmManager != null;
-        alarmManager.cancel(pendingIntent);
+        alarmManager.cancel(getPendingButtonClickIntent(context));
         Log.d(TAG, "cancelAlarmSetToUpdateInFuture: Cancelled Alarm...");
     }
 
@@ -89,8 +93,9 @@ public class GetPriceFromServer extends Service {
         cancelAlarmSetToUpdateInFuture(getApplicationContext());
 
         new CheckIfOnline().execute();
-        setFutureUpdate();
-        return START_NOT_STICKY;
+
+        setFutureUpdate(getApplicationContext());
+        return START_STICKY;
     }
 
     class CheckIfOnline extends AsyncTask<String, String, Boolean> {
@@ -136,7 +141,7 @@ public class GetPriceFromServer extends Service {
         mgr.updateAppWidget(cn, remoteViews);
 
         cancelAlarmSetToUpdateInFuture(getApplicationContext());
-        setFutureUpdate();
+        setFutureUpdate(getApplicationContext());
 
         stopSelf();
     }
