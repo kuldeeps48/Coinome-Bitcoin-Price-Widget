@@ -218,9 +218,9 @@ public class GetPriceFromServer extends Service {
                             "₹ " + format.format(curSell).substring(3));
 
 
-                    SharedPreferences lastPrices = getSharedPreferences(coin + PREF_NAME, MODE_PRIVATE);
-                    float lastBuy = lastPrices.getFloat("buy", 0);
-                    float lastSell = lastPrices.getFloat("sell", 0);
+                    SharedPreferences lastPrices = getSharedPreferences("" + coin + PREF_NAME, MODE_PRIVATE);
+                    float lastBuy = lastPrices.getFloat("buy", 0.0f);
+                    float lastSell = lastPrices.getFloat("sell", 0.0f);
 
                     if (curBuy - lastBuy > 0) {
                         remoteViews.setImageViewResource(R.id.img_buy_status, R.drawable.up_green_arrow);
