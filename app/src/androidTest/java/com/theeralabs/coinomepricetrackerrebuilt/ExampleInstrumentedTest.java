@@ -1,4 +1,4 @@
-package com.theeralabs.coinomepricetrackerlive;
+package com.theeralabs.coinomepricetrackerrebuilt;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

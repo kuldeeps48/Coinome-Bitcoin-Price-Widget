@@ -1,6 +1,6 @@
-package com.theeralabs.coinomepricetrackerlive.api;
+package com.theeralabs.coinomepricetrackerrebuilt.api;
 
-import com.theeralabs.coinomepricetrackerlive.model.PriceData;
+import com.theeralabs.coinomepricetrackerrebuilt.model.PriceData;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

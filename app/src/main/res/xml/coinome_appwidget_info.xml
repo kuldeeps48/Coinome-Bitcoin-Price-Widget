@@ -1,10 +1,9 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="180dp"
-    android:minHeight="110dp"
-    android:updatePeriodMillis="0"
-    android:previewImage="@drawable/preview"
+    android:configure="com.theeralabs.coinomepricetrackerrebuilt.Configure"
     android:initialLayout="@layout/coinome_appwidget"
+    android:minHeight="110dp"
+    android:minWidth="180dp"
+    android:previewImage="@drawable/preview"
     android:resizeMode="none"
-    android:configure="com.theeralabs.coinomepricetrackerlive.Configure"
-    android:widgetCategory="home_screen">
-</appwidget-provider>
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen"></appwidget-provider>

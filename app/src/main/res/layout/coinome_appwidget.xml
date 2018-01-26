@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/gray"
     android:orientation="vertical"
     android:padding="@dimen/widget_padding">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:background="@android:color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
 
         <ProgressBar
             android:id="@+id/progressbar"
-            style="?android:attr/progressBarStyleHorizontal"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:indeterminate="true" />
 
         <LinearLayout
             android:id="@+id/top_row_layout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -34,17 +35,16 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/bitcoin_icon" />
+                android:src="@drawable/loading_placeholder" />
 
             <TextView
                 android:id="@+id/txt_cointype"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="8dp"
                 android:fontFamily="monospace"
                 android:gravity="center"
-                android:text="@string/btc_inr"
-                android:textAppearance="@android:style/TextAppearance.Material.Widget.ActionMode.Subtitle"
+                android:text="@string/loading_coin_to_inr_placeholder"
                 android:textSize="24sp" />
 
             <Button
@@ -52,27 +52,24 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
+                android:layout_marginEnd="4dp"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/refresh_icon"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true" />
+                android:background="@drawable/refresh_icon" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/buy_layout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/buy"
-                android:textAppearance="@android:style/TextAppearance.Material.Caption"
                 android:textSize="14sp" />
 
             <TextView
@@ -80,10 +77,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:fontFamily="sans-serif"
                 android:text="@string/blank"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/img_buy_status"
@@ -91,24 +87,24 @@
                 android:layout_height="20dp"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="4dp"
-                android:scaleType="fitXY"
                 android:src="@drawable/up_green_arrow" />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/sell_layout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:paddingBottom="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="1dp"
                 android:text="@string/sell"
-                android:textAppearance="@android:style/TextAppearance.Material.Caption"
                 android:textSize="14sp" />
 
             <TextView
@@ -117,8 +113,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/blank_2"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/img_sell_status"
@@ -126,7 +122,6 @@
                 android:layout_height="20dp"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="4dp"
-                android:scaleType="fitXY"
                 android:src="@drawable/down_red_arrow" />
         </LinearLayout>
 

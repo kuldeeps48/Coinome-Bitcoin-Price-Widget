@@ -1,4 +1,4 @@
-package com.theeralabs.coinomepricetrackerlive.api;
+package com.theeralabs.coinomepricetrackerrebuilt.api;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
