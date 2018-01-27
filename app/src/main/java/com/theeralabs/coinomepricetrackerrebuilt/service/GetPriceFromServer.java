@@ -84,10 +84,7 @@ public class GetPriceFromServer extends Service {
 
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
+    void createNotificationStartForeground() {
         remoteViews = new RemoteViews(getPackageName(), R.layout.coinome_appwidget);
         mgr = AppWidgetManager.getInstance(getApplicationContext());
 
@@ -97,7 +94,7 @@ public class GetPriceFromServer extends Service {
         } else {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             String channelName = "Network Channel";
-            int importance = NotificationManager.IMPORTANCE_MIN;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                     channelName, importance);
             assert notificationManager != null;
@@ -111,25 +108,27 @@ public class GetPriceFromServer extends Service {
                     .build();
             startForeground(ON_GOING_NOTIF, notification);
         }
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand...");
+        createNotificationStartForeground();
 
-        int[] appWidgetIDS = intent.getExtras().getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-        if (appWidgetIDS != null) {
-            appWidgetID = appWidgetIDS[0];
-            coin = getCoin(getApplicationContext(), appWidgetID);
-        }
+        if (intent != null) {
+            int[] appWidgetIDS = intent.getExtras().getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+            if (appWidgetIDS != null) {
+                appWidgetID = appWidgetIDS[0];
+                coin = getCoin(getApplicationContext(), appWidgetID);
+            }
 
-        if (!coin.isEmpty()) {
-            cancelAlarmSetToUpdateInFuture(getApplicationContext());
-            new CheckIfOnline().execute();
-            setFutureUpdate(getApplicationContext());
+            if (!coin.isEmpty()) {
+                cancelAlarmSetToUpdateInFuture(getApplicationContext());
+                new CheckIfOnline().execute();
+                setFutureUpdate(getApplicationContext());
+            }
         }
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     class CheckIfOnline extends AsyncTask<String, String, Boolean> {
