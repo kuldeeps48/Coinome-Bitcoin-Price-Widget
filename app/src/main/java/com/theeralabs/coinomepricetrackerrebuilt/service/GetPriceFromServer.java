@@ -47,23 +47,21 @@ public class GetPriceFromServer extends Service {
     private static final long FUTURE_UPDATE_TIME_IN_MILLISEC = 60_000;
     private static final String PREF_NAME = "LastPrice";
     private static final int ON_GOING_NOTIF = 776;
-    private static String coin = "";
-    private static int appWidgetID;
     public static final String CHANNEL_ID = String.valueOf(127);
     private static AppWidgetManager mgr;
     private static RemoteViews remoteViews;
 
-    private void setFutureUpdate(Context context) {
+    private void setFutureUpdate(Context context, String coin, int appWidgetID) {
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(ALARM_SERVICE);
         assert alarmManager != null;
         alarmManager.setExact(AlarmManager.ELAPSED_REALTIME,
                 SystemClock.elapsedRealtime() + FUTURE_UPDATE_TIME_IN_MILLISEC,
-                getPendingButtonClickIntent(context));
+                getPendingButtonClickIntent(context, coin, appWidgetID));
         Log.d(TAG, "setFutureUpdate: Alarm set for " +
                 SystemClock.elapsedRealtime() + FUTURE_UPDATE_TIME_IN_MILLISEC);
     }
 
-    private PendingIntent getPendingButtonClickIntent(Context context) {
+    private PendingIntent getPendingButtonClickIntent(Context context, String coin, int appWidgetID) {
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null,
                 context, CoinomeAppWidgetProvider.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[]{appWidgetID});
@@ -71,10 +69,10 @@ public class GetPriceFromServer extends Service {
         return PendingIntent.getBroadcast(context, appWidgetID, intent, 0);
     }
 
-    private void cancelAlarmSetToUpdateInFuture(Context context) {
+    private void cancelAlarmSetToUpdateInFuture(Context context, String coin, int appWidgetID) {
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(ALARM_SERVICE);
         assert alarmManager != null;
-        alarmManager.cancel(getPendingButtonClickIntent(context));
+        alarmManager.cancel(getPendingButtonClickIntent(context, coin, appWidgetID));
         Log.d(TAG, "cancelAlarmSetToUpdateInFuture: Cancelled Alarm...");
     }
 
@@ -85,9 +83,6 @@ public class GetPriceFromServer extends Service {
     }
 
     void createNotificationStartForeground() {
-        remoteViews = new RemoteViews(getPackageName(), R.layout.coinome_appwidget);
-        mgr = AppWidgetManager.getInstance(getApplicationContext());
-
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
             startForeground(ON_GOING_NOTIF, new Notification());
 
@@ -104,6 +99,7 @@ public class GetPriceFromServer extends Service {
                     .setContentTitle("Coinome Price Tracker")
                     .setVisibility(Notification.VISIBILITY_SECRET)
                     .setSubText("")
+                    .setSmallIcon(R.drawable.notification_small_icon)
                     .setOngoing(true)
                     .build();
             startForeground(ON_GOING_NOTIF, notification);
@@ -115,6 +111,12 @@ public class GetPriceFromServer extends Service {
         Log.d(TAG, "onStartCommand...");
         createNotificationStartForeground();
 
+        remoteViews = new RemoteViews(getPackageName(), R.layout.coinome_appwidget);
+        mgr = AppWidgetManager.getInstance(getApplicationContext());
+
+        String coin = "";
+        int appWidgetID = 0;
+
         if (intent != null) {
             int[] appWidgetIDS = intent.getExtras().getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS);
             if (appWidgetIDS != null) {
@@ -123,15 +125,23 @@ public class GetPriceFromServer extends Service {
             }
 
             if (!coin.isEmpty()) {
-                cancelAlarmSetToUpdateInFuture(getApplicationContext());
-                new CheckIfOnline().execute();
-                setFutureUpdate(getApplicationContext());
+                cancelAlarmSetToUpdateInFuture(getApplicationContext(), coin, appWidgetID);
+                new CheckIfOnline(coin, appWidgetID).execute();
+                setFutureUpdate(getApplicationContext(), coin, appWidgetID);
             }
         }
         return START_REDELIVER_INTENT;
     }
 
     class CheckIfOnline extends AsyncTask<String, String, Boolean> {
+        String coin;
+        int appWidgetID;
+
+        CheckIfOnline(String coin, int appWidgetID) {
+            super();
+            this.coin = coin;
+            this.appWidgetID = appWidgetID;
+        }
 
         @Override
         protected Boolean doInBackground(String... strings) {
@@ -158,15 +168,15 @@ public class GetPriceFromServer extends Service {
                 remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
                 //Show on widget
                 mgr.updateAppWidget(appWidgetID, remoteViews);
-                startRetrofitRequest();
+                startRetrofitRequest(coin, appWidgetID);
             } else {
                 Log.d(TAG, "onPostExecute: Offline");
-                noConnection();
+                noConnection(coin, appWidgetID);
             }
         }
     }
 
-    private void noConnection() {
+    private void noConnection(String coin, int appWidgetID) {
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.coinome_appwidget);
         //Remove progressbar
         remoteViews.setViewVisibility(R.id.progressbar, View.INVISIBLE);
@@ -175,11 +185,11 @@ public class GetPriceFromServer extends Service {
         ComponentName cn = new ComponentName(this, CoinomeAppWidgetProvider.class);
         mgr.updateAppWidget(cn, remoteViews);
 
-        cancelAlarmSetToUpdateInFuture(getApplicationContext());
-        setFutureUpdate(getApplicationContext());
+        cancelAlarmSetToUpdateInFuture(getApplicationContext(), coin, appWidgetID);
+        setFutureUpdate(getApplicationContext(), coin, appWidgetID);
     }
 
-    private void startRetrofitRequest() {
+    private void startRetrofitRequest(final String coin, final int appWidgetID) {
         final ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<PriceData> call = apiInterface.getPriceData();
         call.enqueue(new Callback<PriceData>() {
@@ -188,20 +198,30 @@ public class GetPriceFromServer extends Service {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got Response for " + coin);
 
-                    Coin coinINR = response.body().getBTCINR();
+
+                    PriceData priceData = response.body();
+                    if (priceData == null) {
+                        onFailure(call, new Throwable("No priceData received"));
+                        return;
+                    }
+
+                    Coin coinINR;
                     switch (coin) {
                         case "bitcoin":
-                            coinINR = response.body().getBTCINR();
+                            coinINR = priceData.getBTCINR();
                             break;
                         case "bitcoinCash":
-                            coinINR = response.body().getBCHINR();
+                            coinINR = priceData.getBCHINR();
                             break;
                         case "litecoin":
-                            coinINR = response.body().getLTCINR();
+                            coinINR = priceData.getLTCINR();
                             break;
                         case "dash":
-                            coinINR = response.body().getDASHINR();
+                            coinINR = priceData.getDASHINR();
                             break;
+                        default:
+                            onFailure(call, new Throwable("Coin not found"));
+                            return;
                     }
 
                     float curBuy = Float.parseFloat(coinINR.getHighestBid());
@@ -209,7 +229,11 @@ public class GetPriceFromServer extends Service {
 
 
                     NumberFormat format = NumberFormat.getCurrencyInstance(Locale.getDefault());
-                    format.setCurrency(Currency.getInstance("IND"));
+                    try {
+                        format.setCurrency(Currency.getInstance("IND"));
+                    } catch (IllegalArgumentException e) {
+                        format.setCurrency(Currency.getInstance(Locale.US));
+                    }
 
                     remoteViews.setTextViewText(R.id.txt_buy_price,
                             "₹ " + format.format(curBuy).substring(3));
@@ -233,12 +257,12 @@ public class GetPriceFromServer extends Service {
 
 
                     saveCurrentPrice(coinINR);
+
                     //Update widget
                     //Remove progressbar
                     remoteViews.setViewVisibility(R.id.progressbar, View.INVISIBLE);
                     mgr.updateAppWidget(appWidgetID, remoteViews);
 
-                    coin = "";
                     Log.d(TAG, "Finished Response...");
 
                 } else {
@@ -249,8 +273,6 @@ public class GetPriceFromServer extends Service {
 
                     //Update widget
                     mgr.updateAppWidget(appWidgetID, remoteViews);
-
-                    coin = "";
                 }
 
             }
@@ -275,7 +297,6 @@ public class GetPriceFromServer extends Service {
                 //Update widget
                 mgr.updateAppWidget(appWidgetID, remoteViews);
 
-                coin = "";
             }
         });
     }

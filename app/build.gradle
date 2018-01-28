@@ -6,8 +6,8 @@ android {
         applicationId "com.theeralabs.coinomepricetrackerrebuilt"
         minSdkVersion 22
         targetSdkVersion 27
-        versionCode 10
-        versionName "10.0"
+        versionCode 12
+        versionName "11.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
