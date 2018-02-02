@@ -96,7 +96,6 @@ public class GetPriceFromServer extends Service {
             notificationManager.createNotificationChannel(notificationChannel);
             Notification notification = new Notification.Builder(getApplicationContext(),
                     CHANNEL_ID)
-                    .setContentTitle("Coinome Price Tracker")
                     .setVisibility(Notification.VISIBILITY_SECRET)
                     .setSubText("")
                     .setSmallIcon(R.drawable.notification_small_icon)
@@ -224,8 +223,15 @@ public class GetPriceFromServer extends Service {
                             return;
                     }
 
-                    float curBuy = Float.parseFloat(coinINR.getHighestBid());
-                    float curSell = Float.parseFloat(coinINR.getLowestAsk());
+                    float curBuy;
+                    float curSell;
+                    try {
+                        curBuy = Float.parseFloat(coinINR.getHighestBid());
+                        curSell = Float.parseFloat(coinINR.getLowestAsk());
+                    } catch (NullPointerException e) {
+                        onFailure(call, new Throwable("No Price found"));
+                        return;
+                    }
 
 
                     NumberFormat format = NumberFormat.getCurrencyInstance(Locale.getDefault());
