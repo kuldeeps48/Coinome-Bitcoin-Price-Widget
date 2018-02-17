@@ -162,7 +162,7 @@
         android:foregroundGravity="center|bottom"
         android:gravity="center"
         android:padding="8dp"
-        android:text="Rate and review :)"
+        android:text="@string/if_you_find_the_app_useful_click_here_to_leave_a_rating_on_play_store_d"
         android:textColor="@color/colorAccent"
         android:textSize="18sp"
         android:textStyle="bold" />

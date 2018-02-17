@@ -207,16 +207,16 @@ public class GetPriceFromServer extends Service {
                     Coin coinINR;
                     switch (coin) {
                         case "bitcoin":
-                            coinINR = priceData.getBTCINR();
+                            coinINR = priceData.getBtcInr();
                             break;
                         case "bitcoinCash":
-                            coinINR = priceData.getBCHINR();
+                            coinINR = priceData.getBchInr();
                             break;
                         case "litecoin":
-                            coinINR = priceData.getLTCINR();
+                            coinINR = priceData.getLtcInr();
                             break;
                         case "dash":
-                            coinINR = priceData.getDASHINR();
+                            coinINR = priceData.getDashInr();
                             break;
                         default:
                             onFailure(call, new Throwable("Coin not found"));

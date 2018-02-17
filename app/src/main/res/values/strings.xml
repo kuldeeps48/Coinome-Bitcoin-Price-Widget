@@ -11,4 +11,5 @@
     <string name="bitcoin_cash">Bitcoin Cash</string>
     <string name="bitcoin">Bitcoin</string>
     <string name="loading_coin_to_inr_placeholder">-/INR</string>
+    <string name="if_you_find_the_app_useful_click_here_to_leave_a_rating_on_play_store_d">If you find the app useful, Click here to leave a rating on Play Store :D</string>
 </resources>

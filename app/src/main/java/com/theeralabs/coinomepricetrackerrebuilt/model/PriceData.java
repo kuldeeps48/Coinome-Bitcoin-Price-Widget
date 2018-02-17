@@ -5,50 +5,60 @@ import com.google.gson.annotations.SerializedName;
 
 public class PriceData {
 
-    @SerializedName("BTC-INR")
-    @Expose
-    private BTCINR bTCINR;
-    @SerializedName("BCH-INR")
-    @Expose
-    private BCHINR bCHINR;
-    @SerializedName("LTC-INR")
-    @Expose
-    private LTCINR lTCINR;
-    @SerializedName("DASH-INR")
-    @Expose
-    private DASHINR dASHINR;
+@SerializedName("btc-inr")
+@Expose
+private BtcInr btcInr;
+@SerializedName("bch-inr")
+@Expose
+private BchInr bchInr;
+@SerializedName("ltc-inr")
+@Expose
+private LtcInr ltcInr;
+@SerializedName("dash-inr")
+@Expose
+private DashInr dashInr;
+@SerializedName("dgb-inr")
+@Expose
+private DgbInr dgbInr;
 
-    public BTCINR getBTCINR() {
-        return bTCINR;
-    }
+public BtcInr getBtcInr() {
+return btcInr;
+}
 
-    public void setBTCINR(BTCINR bTCINR) {
-        this.bTCINR = bTCINR;
-    }
+public void setBtcInr(BtcInr btcInr) {
+this.btcInr = btcInr;
+}
 
-    public BCHINR getBCHINR() {
-        return bCHINR;
-    }
+public BchInr getBchInr() {
+return bchInr;
+}
 
-    public void setBCHINR(BCHINR bCHINR) {
-        this.bCHINR = bCHINR;
-    }
+public void setBchInr(BchInr bchInr) {
+this.bchInr = bchInr;
+}
 
-    public LTCINR getLTCINR() {
-        return lTCINR;
-    }
+public LtcInr getLtcInr() {
+return ltcInr;
+}
 
-    public void setLTCINR(LTCINR lTCINR) {
-        this.lTCINR = lTCINR;
-    }
+public void setLtcInr(LtcInr ltcInr) {
+this.ltcInr = ltcInr;
+}
 
-    public DASHINR getDASHINR() {
-        return dASHINR;
-    }
+public DashInr getDashInr() {
+return dashInr;
+}
 
-    public void setDASHINR(DASHINR dASHINR) {
-        this.dASHINR = dASHINR;
-    }
+public void setDashInr(DashInr dashInr) {
+this.dashInr = dashInr;
+}
 
+public DgbInr getDgbInr() {
+return dgbInr;
+}
+
+public void setDgbInr(DgbInr dgbInr) {
+this.dgbInr = dgbInr;
+}
 
 }
