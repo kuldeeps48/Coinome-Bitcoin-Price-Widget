@@ -61,6 +61,10 @@ public class CoinomeAppWidgetProvider extends AppWidgetProvider {
                     Log.d(TAG, "coin => " + coin);
                     setTextAndIcon(R.drawable.dash_icon, "DSH/INR", remoteViews);
                     break;
+                case "digibyte":
+                    Log.d(TAG, "coin => " + coin);
+                    setTextAndIcon(R.drawable.digibyte_icon, "DGB/INR", remoteViews);
+                    break;
                 default:
                     Log.d(TAG, "coin => NO COIN!");
                     return;

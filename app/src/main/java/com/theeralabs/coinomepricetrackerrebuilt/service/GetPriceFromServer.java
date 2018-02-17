@@ -218,6 +218,9 @@ public class GetPriceFromServer extends Service {
                         case "dash":
                             coinINR = priceData.getDashInr();
                             break;
+                        case "digibyte":
+                            coinINR = priceData.getDgbInr();
+                            break;
                         default:
                             onFailure(call, new Throwable("Coin not found"));
                             return;

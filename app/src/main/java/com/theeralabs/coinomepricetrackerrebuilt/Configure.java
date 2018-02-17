@@ -21,7 +21,7 @@ import static android.content.ContentValues.TAG;
 
 public class Configure extends AppCompatActivity {
 
-    private LinearLayout layoutBitcoin, layoutBitcoinCash, layoutLitecoin, layoutDash;
+    private LinearLayout layoutBitcoin, layoutBitcoinCash, layoutLitecoin, layoutDash, layoutDigiByte;
     private TextView txtRate;
     private int mAppWidgetId;
     private AppWidgetManager appWidgetManager;
@@ -52,6 +52,7 @@ public class Configure extends AppCompatActivity {
         layoutBitcoinCash = findViewById(R.id.item_bitcoin_cash);
         layoutLitecoin = findViewById(R.id.item_litecoin);
         layoutDash = findViewById(R.id.item_dash);
+        layoutDigiByte = findViewById(R.id.item_digibyte);
 
         layoutBitcoin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +79,13 @@ public class Configure extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 setLayoutAndExit(R.drawable.dash_icon, "DSH/INR", "dash");
+            }
+        });
+
+        layoutDigiByte.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setLayoutAndExit(R.drawable.digibyte_icon, "DGB/INR", "digibyte");
             }
         });
 
